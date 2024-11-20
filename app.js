@@ -16,10 +16,10 @@ const slackChannel = process.env.SLACK_CHANNEL; // Slack channel to post message
 const repos = process.env.GH_REPOS.split(','); // Expected format: "org1/repo1,org2/repo2,..."
 
 // List of team members to filter PRs
-const teamMembers = process.env.GH_TEAM_MEMBERS.split(','); // Expected format: "user1,user2,..."
+const teamMembers = process.env.GH_TEAM_MEMBERS ? process.env.GH_TEAM_MEMBERS.split(',') : []; // Expected format: "user1,user2,..."
 
-// List of teams to filter PRs (e.g., GitHub teams)
-const teams = process.env.GH_TEAMS.split(','); // Expected format: "team1,team2,..."
+// List of GH teams to filter PRs
+const teams = process.env.GH_TEAMS ? process.env.GH_TEAMS.split(',') : []; // Expected format: "team1,team2,..."
 
 // Mapping GitHub usernames to Slack usernames
 const githubToSlackMap = JSON.parse(process.env.GH_TO_SLACK_USER_MAP); // Expected format: "{\"githubUser1\": \"slackUser1\", ...}"
