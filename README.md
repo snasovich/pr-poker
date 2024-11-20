@@ -8,6 +8,7 @@ PR Poker (as in "to poke") is a tool designed to facilitate pull request (PR) re
 - **Slack Integration**: Posts a summary of PRs to a Slack channel and notifies individual reviewers directly in thread responses to the summary message (to reduce channel noise).
 - **Configurable Settings** for Slack notifications, GitHub repositories, and team members.
 - **Customizable Thresholds** for PR approvals and age to determine categorization.
+- **Detailed Logging** using Winston, with configurable log levels to control verbosity, including detailed error stack traces for debugging.
 
 ## Setup
 
@@ -46,6 +47,7 @@ OLD_PR_THRESHOLD_DAYS=7
 # Optional settings
 ENABLE_MESSAGE_LOGGING=true # Logs Slack messages to console for debugging purposes; defaults to "false"
 ENABLE_SLACK_POSTING=true   # Set to "false" to NOT post messages to Slack; defaults to "true"
+LOG_LEVEL=info              # Set the logging level; can be "error", "warn", "info", "debug", "silly"
 ```
 
 ### Installation
@@ -77,6 +79,7 @@ ENABLE_SLACK_POSTING=true   # Set to "false" to NOT post messages to Slack; defa
   - Whether the PR has a sufficient number of approvals.
   - If the PR is older than a configurable threshold.
 - A Slack summary message is sent to a channel, and individual team members are notified about PRs assigned to them or those needing further action.
+- **Logging**: The tool uses Winston for logging, allowing for configurable log levels (`error`, `warn`, `info`, `debug`, `silly`). Error stack traces are logged to help with debugging.
 
 ## Environment Variables Explained
 
@@ -88,8 +91,9 @@ ENABLE_SLACK_POSTING=true   # Set to "false" to NOT post messages to Slack; defa
   - **Important Note:** Slack username must be internal Slack user ID (e.g. "U081YAAAAAA")
 - **APPROVAL\_THRESHOLD**: Number of approvals needed for a PR to be considered ready for merge.
 - **OLD\_PR\_THRESHOLD\_DAYS**: Number of days for a PR to be considered "old".
-- **ENABLE\_MESSAGE\_LOGGING**: If set to `true`, enables logging of messages to the console for debugging (defaults to `false`).
+- **ENABLE\_MESSAGE\_LOGGING**: If set to `true`, logs generated messages to the console for debugging purposes (defaults to `false`).
 - **ENABLE\_SLACK\_POSTING**: If set to `false`, disables sending messages to Slack (defaults to `true`).
+- **LOG\_LEVEL**: Defines the logging level (`error`, `warn`, `info`, `debug`, `silly`); helps control the verbosity of logs.
 
 ## Example Workflow
 
@@ -107,8 +111,9 @@ Feel free to contribute by forking the repository and opening a pull request. Co
 ## Troubleshooting
 
 - **Error: Missing environment variable**: Ensure that all required environment variables are properly defined in the `.env` file.
-- **Slack messages not posting**: Verify that `ENABLE_SLACK_POSTING` is not set to `"false"` and that Slack credentials are correct.
+- **Slack messages not posting**: Verify that `ENABLE_SLACK_POSTING` is not set to "false" and that Slack credentials are correct.
 - **GitHub authentication issues**: Double-check that your GitHub App ID, installation ID, and private key are correctly set.
+- **No log messages appearing**: Ensure that `LOG_LEVEL` is set appropriately and that the console transport is included in the Winston logger configuration.
 
 ## Contact
 
