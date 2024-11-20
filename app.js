@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { createAppAuth } from '@octokit/auth-app';
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
+import { formatDistanceToNow } from 'date-fns';
 
 // Set up GitHub App credentials
 const appId = process.env.GH_APP_ID; // GitHub App ID
@@ -18,7 +19,7 @@ const repos = process.env.GH_REPOS.split(','); // Expected format: "org1/repo1,o
 // List of team members to filter PRs
 const teamMembers = process.env.GH_TEAM_MEMBERS ? process.env.GH_TEAM_MEMBERS.split(',') : []; // Expected format: "user1,user2,..."
 
-// List of GH teams to filter PRs
+// List of teams to filter PRs (e.g., GitHub teams)
 const teams = process.env.GH_TEAMS ? process.env.GH_TEAMS.split(',') : []; // Expected format: "team1,team2,..."
 
 // Mapping GitHub usernames to Slack usernames
@@ -32,29 +33,7 @@ const enableLogging = process.env.ENABLE_MESSAGE_LOGGING === 'true'; // Defaults
 const enableSlackPosting = process.env.ENABLE_SLACK_POSTING !== 'false'; // Defaults to true
 
 const timeSince = (date) => {
-  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-  let interval = Math.floor(seconds / 31536000);
-
-  if (interval > 1) {
-    return `${interval} years ago`;
-  }
-  interval = Math.floor(seconds / 2592000);
-  if (interval > 1) {
-    return `${interval} months ago`;
-  }
-  interval = Math.floor(seconds / 86400);
-  if (interval > 1) {
-    return `${interval} days ago`;
-  }
-  interval = Math.floor(seconds / 3600);
-  if (interval > 1) {
-    return `${interval} hours ago`;
-  }
-  interval = Math.floor(seconds / 60);
-  if (interval > 1) {
-    return `${interval} minutes ago`;
-  }
-  return `${seconds} seconds ago`;
+  return formatDistanceToNow(new Date(date), { addSuffix: true });
 };
 
 const formatPRDetails = (pr) => {
