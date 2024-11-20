@@ -1,0 +1,19 @@
+{
+  "name": "pr-poker",
+  "version": "0.1.0",
+  "main": "app.js",
+  "description": "PR Reminder script for Slack notifications",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "Sergey Nasovich (sergey.nasovich@suse.com)",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@octokit/auth-app": "^7.1.3",
+    "@octokit/rest": "^21.0.2",
+    "@slack/web-api": "^7.7.0",
+    "dotenv": "^16.4.5"
+  }
+}
