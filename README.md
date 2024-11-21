@@ -45,10 +45,10 @@ APPROVAL_THRESHOLD=2
 OLD_PR_THRESHOLD_DAYS=7
 
 # Optional settings
-ENABLE_MESSAGE_LOGGING=true # Logs Slack messages to console for debugging purposes; defaults to "false"
-ENABLE_SLACK_POSTING=true   # Set to "false" to NOT post messages to Slack; defaults to "true"
-ENABLE_INDIVIDUAL_MESSAGES  # Set to "false" to disable sending replies to summary Slack message mentioning individual assignees
-LOG_LEVEL=info              # Set the logging level; can be "error", "warn", "info", "debug", "silly"
+ENABLE_MESSAGE_LOGGING=true     # Logs Slack messages to console for debugging purposes; defaults to "false"
+ENABLE_SLACK_POSTING=true       # Set to "false" to NOT post messages to Slack; defaults to "true"
+ENABLE_INDIVIDUAL_MESSAGES=true # Set to "false" to disable sending replies to summary Slack message mentioning individual assignees
+LOG_LEVEL=info                  # Set the logging level; can be "error", "warn", "info", "debug", "silly"
 ```
 
 ### Installation
