@@ -79,8 +79,27 @@ LOG_LEVEL=info                  # Set the logging level; can be "error", "warn",
   - Whether there are requested changes.
   - Whether the PR has a sufficient number of approvals.
   - If the PR is older than a configurable threshold.
-- A Slack summary message is sent to a channel, and individual team members are notified about PRs assigned to them or those needing further action.
+- A Slack summary message is sent to a channel, and individual team members are optionally notified about PRs assigned to them or those needing further action.
 - **Logging**: The tool uses Winston for logging, allowing for configurable log levels (`error`, `warn`, `info`, `debug`, `silly`). Error stack traces are logged to help with debugging.
+
+## Permissions Requirements
+
+### GitHub Permissions
+
+- **GitHub App**: The GitHub App used must have the following permissions:
+  - **Repository Metadata**: Read access to metadata, which allows the app to see repository details.
+  - **Pull Requests**: Read access to pull requests, so it can list and access information about open PRs.
+  - The app must then be installed to all orgs/repos listed in `GH_REPOS`.
+
+  For detailed instructions on how to create a GitHub App, refer to the [GitHub Docs: Creating a GitHub App](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app).
+
+### Slack Permissions
+
+- **Slack Bot Token**: The Slack Bot Token used for integration should have the following permissions:
+  - `chat:write`: Allows the bot to post messages to channels.
+  - The bot must be invited to the channel where notifications will be posted so it has the necessary access to post messages.
+
+  For detailed instructions on how to create a Slack Bot Token, refer to the [Slack API: Creating a Bot User Token guide](https://api.slack.com/authentication/basics).
 
 ## Environment Variables Explained
 
