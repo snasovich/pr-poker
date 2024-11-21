@@ -52,6 +52,7 @@ const oldPRThresholdDays = parseInt(process.env.OLD_PR_THRESHOLD_DAYS) || 7;
 // Flags
 const enableMessageLogging = process.env.ENABLE_MESSAGE_LOGGING === 'true'; // Defaults to false
 const enableSlackPosting = process.env.ENABLE_SLACK_POSTING !== 'false'; // Defaults to true
+const enableIndividualMessages = process.env.ENABLE_INDIVIDUAL_MESSAGES !== 'false'; // Defaults to true
 
 const timeSince = (date) => {
   return formatDistanceToNow(new Date(date), { addSuffix: true });
@@ -248,87 +249,89 @@ const formatPRDetails = (pr) => {
       logger.info('Posted summary message to Slack');
     }
 
-    const individualMessages = {};
+    if (enableIndividualMessages) {
+      const individualMessages = {};
 
-    for (const pr of matchingPRs) {
-      const prDetails = formatPRDetails(pr);
+      for (const pr of matchingPRs) {
+        const prDetails = formatPRDetails(pr);
 
-      // Add individual Slack messages for team members assigned to PRs
-      const pendingReviewers = pr.requested_reviewers ? pr.requested_reviewers.map(reviewer => reviewer.login) : [];
-      const assignedTeamMembers = pendingReviewers.filter(reviewer => teamMembers.includes(reviewer));
+        // Add individual Slack messages for team members assigned to PRs
+        const pendingReviewers = pr.requested_reviewers ? pr.requested_reviewers.map(reviewer => reviewer.login) : [];
+        const assignedTeamMembers = pendingReviewers.filter(reviewer => teamMembers.includes(reviewer));
 
-      assignedTeamMembers.forEach(assignee => {
-        const slackUser = githubToSlackMap[assignee];
-        if (slackUser) {
-          if (!individualMessages[slackUser]) {
-            individualMessages[slackUser] = {
-              assignedPRs: [],
-              approvedPRs: [],
-              changesRequestedPRs: [],
-            };
+        assignedTeamMembers.forEach(assignee => {
+          const slackUser = githubToSlackMap[assignee];
+          if (slackUser) {
+            if (!individualMessages[slackUser]) {
+              individualMessages[slackUser] = {
+                assignedPRs: [],
+                approvedPRs: [],
+                changesRequestedPRs: [],
+              };
+            }
+            individualMessages[slackUser].assignedPRs.push(prDetails);
           }
-          individualMessages[slackUser].assignedPRs.push(prDetails);
-        }
-      });
-
-      // Include PRs with >= 2 approvals in individual messages
-      if (approvedPRs.includes(pr)) {
-        const slackUser = githubToSlackMap[pr.user.login];
-        if (slackUser) {
-          if (!individualMessages[slackUser]) {
-            individualMessages[slackUser] = {
-              assignedPRs: [],
-              approvedPRs: [],
-              changesRequestedPRs: [],
-            };
-          }
-          individualMessages[slackUser].approvedPRs.push(prDetails);
-        }
-      }
-
-      // Include PRs with changes requested in individual messages for the PR author
-      if (changesRequestedPRs.includes(pr)) {
-        const slackUser = githubToSlackMap[pr.user.login];
-        if (slackUser) {
-          if (!individualMessages[slackUser]) {
-            individualMessages[slackUser] = {
-              assignedPRs: [],
-              approvedPRs: [],
-              changesRequestedPRs: [],
-            };
-          }
-          individualMessages[slackUser].changesRequestedPRs.push(prDetails);
-        }
-      }
-    }
-
-    for (const [slackUser, messages] of Object.entries(individualMessages)) {
-      let individualMessage = `Hey <@${slackUser}>, you have the following PRs to take a closer look at:\n`;
-      if (messages.approvedPRs.length > 0) {
-        individualMessage += `*Your PRs with >= ${approvalThreshold} Approvals (Probably Ready to Merge):*\n${messages.approvedPRs.join('\n')}\n`;
-      }
-      if (messages.changesRequestedPRs.length > 0) {
-        individualMessage += `*Your PRs with Changes Requested:*\n${messages.changesRequestedPRs.join('\n')}\n`;
-      }
-      if (messages.assignedPRs.length > 0) {
-        individualMessage += `*Directly Requested Review:*\n${messages.assignedPRs.join('\n')}\n`;
-      }
-
-      logger.info(`Generated individual message for Slack user: ${slackUser}`);
-      if (enableMessageLogging) {
-        logger.info(individualMessage);
-      }
-
-      // Post the individual message as a thread response to the summary message
-      if (enableSlackPosting && summaryResponse) {
-        await slackClient.chat.postMessage({
-          channel: slackChannel,
-          text: individualMessage,
-          unfurl_links: false,
-          unfurl_media: false,
-          thread_ts: summaryResponse.ts,
         });
-        logger.info(`Posted individual message for Slack user: ${slackUser}`);
+
+        // Include PRs with >= 2 approvals in individual messages
+        if (approvedPRs.includes(pr)) {
+          const slackUser = githubToSlackMap[pr.user.login];
+          if (slackUser) {
+            if (!individualMessages[slackUser]) {
+              individualMessages[slackUser] = {
+                assignedPRs: [],
+                approvedPRs: [],
+                changesRequestedPRs: [],
+              };
+            }
+            individualMessages[slackUser].approvedPRs.push(prDetails);
+          }
+        }
+
+        // Include PRs with changes requested in individual messages for the PR author
+        if (changesRequestedPRs.includes(pr)) {
+          const slackUser = githubToSlackMap[pr.user.login];
+          if (slackUser) {
+            if (!individualMessages[slackUser]) {
+              individualMessages[slackUser] = {
+                assignedPRs: [],
+                approvedPRs: [],
+                changesRequestedPRs: [],
+              };
+            }
+            individualMessages[slackUser].changesRequestedPRs.push(prDetails);
+          }
+        }
+      }
+
+      for (const [slackUser, messages] of Object.entries(individualMessages)) {
+        let individualMessage = `Hey <@${slackUser}>, you have the following PRs to take a closer look at:\n`;
+        if (messages.approvedPRs.length > 0) {
+          individualMessage += `*Your PRs with >= ${approvalThreshold} Approvals (Probably Ready to Merge):*\n${messages.approvedPRs.join('\n')}\n`;
+        }
+        if (messages.changesRequestedPRs.length > 0) {
+          individualMessage += `*Your PRs with Changes Requested:*\n${messages.changesRequestedPRs.join('\n')}\n`;
+        }
+        if (messages.assignedPRs.length > 0) {
+          individualMessage += `*Directly Requested Review:*\n${messages.assignedPRs.join('\n')}\n`;
+        }
+
+        logger.info(`Generated individual message for Slack user: ${slackUser}`);
+        if (enableMessageLogging) {
+          logger.info(individualMessage);
+        }
+
+        // Post the individual message as a thread response to the summary message
+        if (enableSlackPosting && summaryResponse) {
+          await slackClient.chat.postMessage({
+            channel: slackChannel,
+            text: individualMessage,
+            unfurl_links: false,
+            unfurl_media: false,
+            thread_ts: summaryResponse.ts,
+          });
+          logger.info(`Posted individual message for Slack user: ${slackUser}`);
+        }
       }
     }
 

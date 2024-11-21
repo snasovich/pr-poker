@@ -47,6 +47,7 @@ OLD_PR_THRESHOLD_DAYS=7
 # Optional settings
 ENABLE_MESSAGE_LOGGING=true # Logs Slack messages to console for debugging purposes; defaults to "false"
 ENABLE_SLACK_POSTING=true   # Set to "false" to NOT post messages to Slack; defaults to "true"
+ENABLE_INDIVIDUAL_MESSAGES  # Set to "false" to disable sending replies to summary Slack message mentioning individual assignees
 LOG_LEVEL=info              # Set the logging level; can be "error", "warn", "info", "debug", "silly"
 ```
 
@@ -93,6 +94,7 @@ LOG_LEVEL=info              # Set the logging level; can be "error", "warn", "in
 - **OLD\_PR\_THRESHOLD\_DAYS**: Number of days for a PR to be considered "old".
 - **ENABLE\_MESSAGE\_LOGGING**: If set to `true`, logs generated messages to the console for debugging purposes (defaults to `false`).
 - **ENABLE\_SLACK\_POSTING**: If set to `false`, disables sending messages to Slack (defaults to `true`).
+- **ENABLE\_INDIVIDUAL\_MESSAGES**: If set to `false`, disables sending replies to summary Slack message (the ones @-mentioning individual assignees)
 - **LOG\_LEVEL**: Defines the logging level (`error`, `warn`, `info`, `debug`, `silly`); helps control the verbosity of logs.
 
 ## Example Workflow
