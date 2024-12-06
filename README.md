@@ -45,13 +45,11 @@ APPROVAL_THRESHOLD=2
 OLD_PR_THRESHOLD_DAYS=7
 
 # Optional settings
-ENABLE_MESSAGE_LOGGING=true     # Logs Slack messages to console for debugging purposes; defaults to "false"
-ENABLE_SLACK_POSTING=true       # Set to "false" to NOT post messages to Slack; defaults to "true"
-ENABLE_INDIVIDUAL_MESSAGES=true # Set to "false" to disable sending replies to the summary Slack message mentioning individual assignees
-LOG_LEVEL=info                  # Set the logging level; can be "error", "warn", "info", "debug", "silly"
-
-# Customize the initial message header (if needed)
-SLACK_SUMMARY_MESSAGE_HEADER="Daily Pull Request Status"
+ENABLE_MESSAGE_LOGGING=true                              # Logs Slack messages to console for debugging purposes; defaults to "false"
+ENABLE_SLACK_POSTING=true                                # Set to "false" to NOT post messages to Slack; defaults to "true"
+ENABLE_INDIVIDUAL_MESSAGES=true                          # Set to "false" to disable sending replies to the summary Slack message mentioning individual assignees
+LOG_LEVEL=info                                           # Set the logging level; can be "error", "warn", "info", "debug", "silly"
+SLACK_SUMMARY_MESSAGE_HEADER="Daily Pull Request Status" # Customize the initial message header (if needed)
 ```
 
 ### Installation
