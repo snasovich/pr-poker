@@ -49,6 +49,9 @@ const githubToSlackMap = JSON.parse(process.env.GH_TO_SLACK_USER_MAP); // Expect
 const approvalThreshold = parseInt(process.env.APPROVAL_THRESHOLD) || 2;
 const oldPRThresholdDays = parseInt(process.env.OLD_PR_THRESHOLD_DAYS) || 7;
 
+// Other settings
+const summaryMessageHeader = process.env.SLACK_SUMMARY_MESSAGE_HEADER || 'PR Summary for Team';
+
 // Flags
 const enableMessageLogging = process.env.ENABLE_MESSAGE_LOGGING === 'true'; // Defaults to false
 const enableSlackPosting = process.env.ENABLE_SLACK_POSTING !== 'false'; // Defaults to true
@@ -177,7 +180,7 @@ const formatPRDetails = (pr) => {
         continue;
       }
 
-      // Check if PR has >= 2 approvals
+      // Check if PR has >= approvalThreshold approvals
       const approvals = latestReviews.filter(review => review.state === 'APPROVED');
       if (approvals.length >= approvalThreshold) {
         logger.debug(`PR has sufficient approvals: ${pr.html_url}`);
@@ -200,8 +203,8 @@ const formatPRDetails = (pr) => {
 
     logger.debug("Generating summary message");
 
-    // Generate Slack summary message
-    let summaryMessage = `*PR Summary for Team*\nTotal PRs: ${matchingPRs.length}\n`;
+    // Generate Slack summary message with configurable header
+    let summaryMessage = `*${summaryMessageHeader}*\nTotal PRs: ${matchingPRs.length}\n`;
 
     if (changesRequestedPRs.length > 0) {
       summaryMessage += `\n*PRs with Changes Requested*\n`;
@@ -273,7 +276,7 @@ const formatPRDetails = (pr) => {
           }
         });
 
-        // Include PRs with >= 2 approvals in individual messages
+        // Include PRs with >= approvalThreshold approvals in individual messages for PR authors
         if (approvedPRs.includes(pr)) {
           const slackUser = githubToSlackMap[pr.user.login];
           if (slackUser) {

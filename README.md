@@ -47,8 +47,11 @@ OLD_PR_THRESHOLD_DAYS=7
 # Optional settings
 ENABLE_MESSAGE_LOGGING=true     # Logs Slack messages to console for debugging purposes; defaults to "false"
 ENABLE_SLACK_POSTING=true       # Set to "false" to NOT post messages to Slack; defaults to "true"
-ENABLE_INDIVIDUAL_MESSAGES=true # Set to "false" to disable sending replies to summary Slack message mentioning individual assignees
+ENABLE_INDIVIDUAL_MESSAGES=true # Set to "false" to disable sending replies to the summary Slack message mentioning individual assignees
 LOG_LEVEL=info                  # Set the logging level; can be "error", "warn", "info", "debug", "silly"
+
+# Customize the initial message header (if needed)
+SLACK_SUMMARY_MESSAGE_HEADER="Daily Pull Request Status"
 ```
 
 ### Installation
@@ -79,7 +82,8 @@ LOG_LEVEL=info                  # Set the logging level; can be "error", "warn",
   - Whether there are requested changes.
   - Whether the PR has a sufficient number of approvals.
   - If the PR is older than a configurable threshold.
-- A Slack summary message is sent to a channel, and individual team members are optionally notified about PRs assigned to them or those needing further action.
+- A Slack summary message is sent to a channel. By default, the first line of this summary message is `PR Summary for Team`. You can customize it by setting `SLACK_SUMMARY_MESSAGE_HEADER` env var.
+- Individual Slack messages are posted as responses to the summary message and @-mention Slack users for PRs relevant to them (unless `ENABLE_INDIVIDUAL_MESSAGES` is set to `false`)
 - **Logging**: The tool uses Winston for logging, allowing for configurable log levels (`error`, `warn`, `info`, `debug`, `silly`). Error stack traces are logged to help with debugging.
 
 ## Permissions Requirements
@@ -104,17 +108,18 @@ LOG_LEVEL=info                  # Set the logging level; can be "error", "warn",
 ## Environment Variables Explained
 
 - **GH\_APP\_ID, GH\_INSTALLATION\_ID, GH\_PRIVATE\_KEY**: Credentials for authenticating the GitHub App.
-- **SLACK\_TOKEN, SLACK\_CHANNEL**: Slack Bot token and channel to post notifications.
+- **SLACK\_TOKEN, SLACK\_CHANNEL**: Slack Bot token and the channel to post notifications.
 - **GH\_REPOS**: Comma-separated list of repositories to monitor for PRs.
 - **GH\_TEAM\_MEMBERS, GH\_TEAMS**: Lists of GitHub usernames and teams whose PRs are being tracked.
 - **GH\_TO\_SLACK\_USER\_MAP**: JSON mapping of GitHub usernames to Slack usernames for individual notifications.
-  - **Important Note:** Slack username must be internal Slack user ID (e.g. "U081YAAAAAA")
+  - **Important Note:** Slack username must be the internal Slack user ID (e.g. `U081YAAAAAA`).
 - **APPROVAL\_THRESHOLD**: Number of approvals needed for a PR to be considered ready for merge.
-- **OLD\_PR\_THRESHOLD\_DAYS**: Number of days for a PR to be considered "old".
+- **OLD\_PR\_THRESHOLD\_DAYS**: Number of days after which a PR is considered "old".
 - **ENABLE\_MESSAGE\_LOGGING**: If set to `true`, logs generated messages to the console for debugging purposes (defaults to `false`).
 - **ENABLE\_SLACK\_POSTING**: If set to `false`, disables sending messages to Slack (defaults to `true`).
-- **ENABLE\_INDIVIDUAL\_MESSAGES**: If set to `false`, disables sending replies to summary Slack message (the ones @-mentioning individual assignees)
+- **ENABLE\_INDIVIDUAL\_MESSAGES**: If set to `false`, disables sending replies to the summary Slack message (the ones @-mentioning individual assignees).
 - **LOG\_LEVEL**: Defines the logging level (`error`, `warn`, `info`, `debug`, `silly`); helps control the verbosity of logs.
+- **SLACK\_SUMMARY\_MESSAGE\_HEADER**: Customizes the initial header line of the Slack summary message (defaults to `PR Summary for Team` if not set).
 
 ## Example Workflow
 
@@ -123,7 +128,8 @@ LOG_LEVEL=info                  # Set the logging level; can be "error", "warn",
   - Have changes requested.
   - Have sufficient approvals to be merged.
   - Are older than the defined threshold.
-- Individual Slack messages are posted as responses to summary message and @-mention Slack users for PRs that are relevant to them specifically.
+- If `SLACK_SUMMARY_MESSAGE_HEADER` is set, that text is displayed as the first line of the summary message.
+- Individual Slack messages are posted as responses to the summary message, @-mentioning Slack users for PRs they need to take action on.
 
 ## Contributing
 
@@ -132,7 +138,7 @@ Feel free to contribute by forking the repository and opening a pull request. Co
 ## Troubleshooting
 
 - **Error: Missing environment variable**: Ensure that all required environment variables are properly defined in the `.env` file.
-- **Slack messages not posting**: Verify that `ENABLE_SLACK_POSTING` is not set to "false" and that Slack credentials are correct.
+- **Slack messages not posting**: Verify that `ENABLE_SLACK_POSTING` is not set to `false` and that Slack credentials are correct.
 - **GitHub authentication issues**: Double-check that your GitHub App ID, installation ID, and private key are correctly set.
 - **No log messages appearing**: Ensure that `LOG_LEVEL` is set appropriately and that the console transport is included in the Winston logger configuration.
 
